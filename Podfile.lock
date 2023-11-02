@@ -1,0 +1,20 @@
+PODS:
+  - SkeletonView (1.30.4)
+  - Swinject (2.8.3)
+
+DEPENDENCIES:
+  - SkeletonView
+  - Swinject
+
+SPEC REPOS:
+  trunk:
+    - SkeletonView
+    - Swinject
+
+SPEC CHECKSUMS:
+  SkeletonView: 5a050f6411e697abd4cda0a8d767013399dccd69
+  Swinject: 893c9a543000ac2f10ee4cbaf0933c6992c935d5
+
+PODFILE CHECKSUM: 8af538e98816f76508bd1c57dba70871c73fceb7
+
+COCOAPODS: 1.11.3
