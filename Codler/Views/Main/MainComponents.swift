@@ -50,6 +50,7 @@ public class MainComponents: ComponentsProtocol {
                 progressView.layer.borderColor = UIColor(hex: "#707F99FF")?.cgColor
                 progressView.progressTintColor = UIColor(hex: "#707F99FF")
                 if Float(rating) / 300 >= 0.01 { progressView.progress = Float(rating) / 300 }
+                else { progressView.progress = 0 }
                 
             } else if 300 <= rating && rating < 1000 {
                 levelTextView.text = "Уровень: Junior"
@@ -62,6 +63,8 @@ public class MainComponents: ComponentsProtocol {
                 progressView.layer.borderColor = UIColor(hex: "#3AEA1FFF")?.cgColor
                 progressView.progressTintColor = UIColor(hex: "#3AEA1FFF")
                 if Float(rating) / 1000 >= 0.01 { progressView.progress = Float(rating) / 1000 }
+                else { progressView.progress = 0 }
+                
             } else if 1000 <= rating && rating < 2000 {
                 levelTextView.text = "Уровень: Middle"
                 levelTextView.textColor = UIColor(hex: "#FFD600FF")
@@ -73,6 +76,8 @@ public class MainComponents: ComponentsProtocol {
                 progressView.layer.borderColor = UIColor(hex: "#FFD600FF")?.cgColor
                 progressView.progressTintColor = UIColor(hex: "#FFD600FF")
                 if Float(rating) / 2000 >= 0.01 { progressView.progress = Float(rating) / 2000 }
+                else { progressView.progress = 0 }
+                
             } else if 2000 <= rating && rating < 3500 {
                 levelTextView.text = "Уровень: Senior"
                 levelTextView.textColor = UIColor(hex: "#FF3D00FF")
@@ -84,6 +89,8 @@ public class MainComponents: ComponentsProtocol {
                 progressView.layer.borderColor = UIColor(hex: "#FF3D00FF")?.cgColor
                 progressView.progressTintColor = UIColor(hex: "#FF3D00FF")
                 if Float(rating) / 3500 >= 0.01 { progressView.progress = Float(rating) / 3500 }
+                else { progressView.progress = 0 }
+                
             } else if 3500 <= rating {
                 levelTextView.text = "Уровень: Lead"
                 levelTextView.textColor = UIColor(hex: "#8E48EAFF")

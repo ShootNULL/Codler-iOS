@@ -25,6 +25,8 @@ class MainViewController: UIViewController {
         setUp()
     }
     
+    private var pan = UIPanGestureRecognizer()
+    
     private func setUp() {
         print("kek")
         view.backgroundColor = UIColor(named: "ColorDark") ?? .black
@@ -35,7 +37,10 @@ class MainViewController: UIViewController {
         setUpProfile()
         setUpTextMain()
         
+        setUpUpdater()
+        
         DI.shared.getMainViewPresenter().changeIcon()
+        
     }
     
     private func setUpTextMain() {
@@ -103,7 +108,6 @@ class MainViewController: UIViewController {
             training.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 10),
             training.rightAnchor.constraint(equalTo: view.centerXAnchor, constant: -10),
             training.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.22)
-//            training.heightAnchor.constraint(equalToConstant: 190)
         ]
         
         view.addSubview(training)
@@ -118,16 +122,80 @@ class MainViewController: UIViewController {
             gameModes.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -10),
             gameModes.leftAnchor.constraint(equalTo: view.centerXAnchor, constant: 10),
             gameModes.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.22)
-//            gameModes.heightAnchor.constraint(equalToConstant: 190)
         ]
         
         view.addSubview(gameModes)
         NSLayoutConstraint.activate(gameModesConstraints)
     }
     
-    private func skeleton() {
-        
-        view.isSkeletonable = true
-        view.showAnimatedGradientSkeleton()
+    private func setUpUpdater() {
+        pan = UIPanGestureRecognizer.init(target: self, action: #selector(handlePanGesture(_:)))
+        view.addGestureRecognizer(pan)
     }
+    
+    @objc func handlePanGesture(_ sender: UIPanGestureRecognizer) -> Bool {
+        let velocity = sender.velocity(in: view)
+        if abs(velocity.y) < abs(velocity.x) || velocity.y < 0 {
+                return false
+            }
+        
+        let translation = sender.translation(in: view)
+
+        var counter = 1
+        var isSecond = false
+        view.subviews.reversed().forEach { subview in
+            subview.transform = CGAffineTransform(translationX: 0, y: translation.y * CGFloat(counter) * 0.1)
+            if !isSecond && counter == 4 {
+                counter -= 1
+                isSecond = !isSecond
+            }
+            counter += 1
+        }
+        
+        if translation.y > 250  && sender.state == .ended {
+            print("Запустить обновление")
+            
+//            view.removeGestureRecognizer(pan)
+            UIView.animate(withDuration: 0.25, animations: {
+                self.view.subviews.reversed().forEach { subview in
+                    subview.transform = CGAffineTransform(translationX: 0, y: 0)
+                }
+            }) { [self] _ in
+                self.view.showLoader()
+                self.data.updateInfo(appleId: self.data.getSecret(key: "appleId") ?? "")
+            }
+            
+        } else if sender.state == .ended {
+            view.removeGestureRecognizer(pan)
+            UIView.animate(withDuration: 0.25, animations: {
+                self.view.subviews.reversed().forEach { subview in
+                    subview.transform = CGAffineTransform(translationX: 0, y: 0)
+                }
+            }) { _ in
+                self.view.addGestureRecognizer(self.pan)
+            }
+        }
+        
+        return true
+    }
+    
+    func finishUpdate() {
+        DispatchQueue.main.async { [self] in
+            UIApplication.topViewController()?.view.subviews.forEach { subview in
+                if type(of: subview) == MainComponents.SmallProfile.self {
+                    let tempView = subview as! MainComponents.SmallProfile
+                    tempView.setImage(image: UIImage(named: "TemplateProfile") ?? .add)
+                    tempView.setName(name: data.getSecret(key: "name") ?? "")
+                    tempView.updateRating(rating: Int(data.getSecret(key: "rating") ?? "0")!)
+                }
+            }
+        }
+        
+        print(data.getSecret(key: "rating") ?? "0")
+        
+        self.view.removeLoader()
+        
+        
+    }
+    
 }

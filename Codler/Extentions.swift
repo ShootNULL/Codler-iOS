@@ -176,3 +176,85 @@ extension UIButton {
         }
     }
 }
+
+final class CodlerLoader: UIView {
+
+    let backView = UIView()
+    let logo = UIImageView()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        self.backgroundColor = .init(hex: "#151417FF")
+        self.layer.cornerRadius = 25
+        self.frame = CGRect(x: 0, y: -100, width: 100, height: 100)
+        self.center.x = UIApplication.topViewController()?.view.center.x ?? .zero
+//        self.frame.origin.y = UIApplication.topViewController()?.view.safeAreaLayoutGuide.layoutFrame.origin.y ?? .zero
+        
+        addLogo()
+    }
+
+    required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    
+    private func addLogo() {
+        self.addSubview(logo)
+        logo.image = UIImage(named: "ImageShortLogo")
+//        logo.image = UIImage(named: "ImageShortLogo")
+        logo.frame.origin.y = self.frame.origin.y + 115
+        logo.frame.origin.x = 15
+        logo.frame.size = CGSize(width: 70, height: 70)
+    }
+}
+
+extension UIView {
+    func showLoader() {
+        let codlerLoader = CodlerLoader(frame: frame)
+        self.addSubview(codlerLoader)
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            codlerLoader.frame.origin.y = UIApplication.topViewController()?.view.safeAreaLayoutGuide.layoutFrame.origin.y ?? .zero
+        })
+        codlerLoader.subviews[0].rotate360Degrees(duration: 1)
+    }
+
+    func removeLoader() {
+        if let codlerLoader = UIApplication.topViewController()?.view.subviews.first(where: { $0 is CodlerLoader }) {
+            UIView.animate(withDuration: 0.3, animations: {
+                codlerLoader.frame.origin.y = .zero - 100
+                
+            }) { _ in 
+                codlerLoader.removeFromSuperview()
+            }
+            
+        }
+    }
+    
+    func rotate360Degrees(duration: CFTimeInterval = 3) {
+        let rotateAnimation = CABasicAnimation(keyPath: "transform.rotation")
+        rotateAnimation.fromValue = 0.0
+        rotateAnimation.toValue = CGFloat(Double.pi * 2)
+        rotateAnimation.isRemovedOnCompletion = false
+        rotateAnimation.duration = duration
+        rotateAnimation.repeatCount=Float.infinity
+        self.layer.add(rotateAnimation, forKey: nil)
+    }
+//    func showAnimation(_ completionBlock: @escaping () -> Void) {
+//      isUserInteractionEnabled = false
+//        UIView.animate(withDuration: 0.1,
+//                       delay: 0,
+//                       options: .curveLinear,
+//                       animations: { [weak self] in
+//                            self?.transform = CGAffineTransform.init(scaleX: 0.95, y: 0.95)
+//        }) {  (_) in
+//            UIView.animate(withDuration: 0.1,
+//                           delay: 0,
+//                           options: .curveLinear,
+//                           animations: { [weak self] in
+//                                self?.transform = CGAffineTransform.init(scaleX: 1, y: 1)
+//            }) { [weak self] (_) in
+//                self?.isUserInteractionEnabled = true
+//                completionBlock()
+//            }
+//        }
+//    }
+}

@@ -119,6 +119,45 @@ class Auth: AuthProtocol {
         })
     }
     
+    func updateInfo(appleId: String) {
+        let mainViewController = DI.shared.getMainViewController()
+        
+        let version = Bundle.main.buildVersionNumber ?? "0"
+        
+        DispatchQueue.background(background: {
+
+            let url = URL(string: "http://82.146.33.253:8000/api/login?apple_id=" + appleId + "&device=ios&v=" + version)!
+            print(url)
+            let task = URLSession.shared.dataTask(with: url) {(data, response, error) in
+                guard let data = data else { return }
+                
+                let statusCode = (response as? HTTPURLResponse)?.statusCode
+                let stringData = String(data: data, encoding: .utf8)!
+                DispatchQueue.main.sync(execute: {
+                    switch statusCode {
+                    case 200:
+                        self.loadUserData(data: data)
+                        mainViewController.finishUpdate()
+                        print("finish")
+//                        loginViewPresenter.loadResult(result: LoginViewPresenter.Result.allGood)
+//                    case 403:
+//                        loginViewPresenter.loadResult(result: LoginViewPresenter.Result.lowVersion)
+//                    case 401:
+//                        loginViewPresenter.loadResult(result: LoginViewPresenter.Result.userLoginFail)
+//                    case 405:
+//                        loginViewPresenter.loadResult(result: LoginViewPresenter.Result.serverDown)
+                    default:
+                        print("Error")
+                    }
+                })
+                
+            }
+
+            task.resume()
+            
+        })
+    }
+    
     private func loadUserData(data: Data) {
         let decoder = JSONDecoder()
         
